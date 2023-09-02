@@ -7,6 +7,12 @@ import java.awt.event.ActionListener;
 // import java.sql.PreparedStatement;
 // import java.sql.ResultSet;
 // import java.sql.SQLException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class AdminDashboard extends JFrame {
     public AdminDashboard() {
@@ -31,15 +37,13 @@ public class AdminDashboard extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Transition to view customer data screen
-                // For example: new ViewCustomerDataScreen().setVisible(true);
             }
         });
 
         setMonthlyConsumptionButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Transition to set monthly consumption screen
-                // For example: new SetMonthlyConsumptionScreen().setVisible(true);
+                openSetMonthlyConsumptionDialog();
             }
         });
 
@@ -47,9 +51,128 @@ public class AdminDashboard extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Transition to view complaints screen
-                // For example: new ViewComplaintsScreen().setVisible(true);
+                openViewComplaintsDialog();
             }
         });
+    }
+
+    private void openViewComplaintsDialog() {
+        try {
+            String url = "jdbc:mysql://localhost:3306/ramdb";
+            String dbUsername = "root";
+            String dbPassword = "Ping@5858";
+
+            Connection connection = DriverManager.getConnection(url, dbUsername, dbPassword);
+
+            String selectQuery = "SELECT cust_name, complaints FROM complaints";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(selectQuery);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            ArrayList<String> complaintsList = new ArrayList<>();
+
+            while (resultSet.next()) {
+                String username = resultSet.getString("cust_name");
+                String complaintText = resultSet.getString("complaints");
+
+                String complaintInfo = "Username: " + username +
+                        "\nComplaint: " + complaintText;
+
+                complaintsList.add(complaintInfo);
+            }
+
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+
+            if (!complaintsList.isEmpty()) {
+                String complaintsText = String.join("\n\n", complaintsList);
+                JTextArea complaintsTextArea = new JTextArea(complaintsText);
+                complaintsTextArea.setEditable(false);
+
+                JOptionPane.showMessageDialog(
+                        AdminDashboard.this,
+                        new JScrollPane(complaintsTextArea),
+                        "Customer Complaints",
+                        JOptionPane.PLAIN_MESSAGE
+                );
+            } else {
+                JOptionPane.showMessageDialog(
+                        AdminDashboard.this,
+                        "No complaints found.",
+                        "Customer Complaints",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(
+                    AdminDashboard.this,
+                    "An error occurred while retrieving complaints.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE
+            );
+        }
+    }
+
+    private void openSetMonthlyConsumptionDialog() {
+        String customerUsername = JOptionPane.showInputDialog(
+                AdminDashboard.this,
+                "Enter customer username:",
+                "Set Monthly Consumption",
+                JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (customerUsername != null && !customerUsername.isEmpty()) {
+            String newConsumptionStr = JOptionPane.showInputDialog(
+                    AdminDashboard.this,
+                    "Enter new monthly consumption value for " + customerUsername + ":",
+                    "Set Monthly Consumption",
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (newConsumptionStr != null && !newConsumptionStr.isEmpty()) {
+                try {
+                    double newConsumption = Double.parseDouble(newConsumptionStr);
+                    updateConsumptionInDatabase(customerUsername, newConsumption);
+                    JOptionPane.showMessageDialog(
+                            AdminDashboard.this,
+                            "Monthly consumption updated successfully.",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(
+                            AdminDashboard.this,
+                            "Invalid consumption value. Please enter a valid number.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+        }
+    }
+    private void updateConsumptionInDatabase(String username, double consumption) {
+        String updateQuery = "UPDATE cust_table SET consumption = ? WHERE username = ?";
+        String url = "jdbc:mysql://localhost:3306/ramdb";
+        String dbUsername = "root";
+        String dbPassword = "Ping@5858";
+        try (Connection connection = DriverManager.getConnection(url, dbUsername, dbPassword);
+            PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+            preparedStatement.setDouble(1, consumption);
+            preparedStatement.setString(2, username);
+            int rowsUpdated = preparedStatement.executeUpdate();
+            System.out.println(preparedStatement);
+            if (rowsUpdated > 0) {
+                System.out.println("Consumption updated in the database.");
+            } else {
+                System.out.println("Failed to update consumption in the database.");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            System.out.println("An error occurred while updating consumption in the database.");
+        }
     }
 
     public static void main(String[] args) {

@@ -39,12 +39,10 @@ public class ComplaintScreen extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 String complaint = complaintTextArea.getText();
 
-                // Database connection details
                 String url = "jdbc:mysql://localhost:3306/ramdb";
                 String dbUsername = "root";
                 String dbPassword = "Ping@5858";
 
-                // SQL query to insert complaint
                 String query = "INSERT INTO complaints (customer_name, complaint) VALUES (?, ?)";
 
                 try (Connection connection = DriverManager.getConnection(url, dbUsername, dbPassword);

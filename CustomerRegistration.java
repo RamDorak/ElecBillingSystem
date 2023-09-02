@@ -38,7 +38,7 @@ public class CustomerRegistration extends JFrame {
         panel.add(usernameField);
         panel.add(passwordLabel);
         panel.add(passwordField);
-        panel.add(new JLabel()); // Empty label for spacing
+        panel.add(new JLabel()); //Empty label
         panel.add(submitButton);
 
         add(panel);
@@ -51,12 +51,10 @@ public class CustomerRegistration extends JFrame {
                 char[] passwordChars = passwordField.getPassword();
                 String password = new String(passwordChars);
 
-                // Database connection details
                 String url = "jdbc:mysql://localhost:3306/ramdb";
                 String dbUsername = "root";
                 String dbPassword = "Ping@5858";
 
-                // SQL query to insert customer data
                 String query = "INSERT INTO cust_table (name, username, password) VALUES (?, ?, ?)";
 
                 try (Connection connection = DriverManager.getConnection(url, dbUsername, dbPassword);
@@ -87,8 +85,6 @@ public class CustomerRegistration extends JFrame {
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
                 }
-
-                // Clear input fields
                 nameField.setText("");
                 usernameField.setText("");
                 passwordField.setText("");

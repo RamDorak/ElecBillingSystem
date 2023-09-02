@@ -33,7 +33,7 @@ public class AdminLogin extends JFrame {
         panel.add(usernameField);
         panel.add(passwordLabel);
         panel.add(passwordField);
-        panel.add(new JLabel()); // Empty label for spacing
+        panel.add(new JLabel()); //Empty label
         panel.add(loginButton);
 
         add(panel);
@@ -45,12 +45,10 @@ public class AdminLogin extends JFrame {
                 char[] passwordChars = passwordField.getPassword();
                 String password = new String(passwordChars);
 
-                // Database connection details
                 String url = "jdbc:mysql://localhost:3306/ramdb";
                 String dbUsername = "root";
                 String dbPassword = "Ping@5858";
 
-                // SQL query to authenticate admin
                 String query = "SELECT * FROM admin_table WHERE username = ? AND password = ?";
 
                 try (Connection connection = DriverManager.getConnection(url, dbUsername, dbPassword);
@@ -62,7 +60,6 @@ public class AdminLogin extends JFrame {
                     ResultSet resultSet = preparedStatement.executeQuery();
 
                     if (resultSet.next()) {
-                        // Transition to admin dashboard
                         AdminDashboard adminDashboard = new AdminDashboard();
                         adminDashboard.setVisible(true);
                         dispose();
@@ -72,7 +69,6 @@ public class AdminLogin extends JFrame {
                                 "Login Failed",
                                 JOptionPane.ERROR_MESSAGE);
                     }
-
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(AdminLogin.this,
@@ -81,7 +77,6 @@ public class AdminLogin extends JFrame {
                             JOptionPane.ERROR_MESSAGE);
                 }
 
-                // Clear input fields
                 usernameField.setText("");
                 passwordField.setText("");
             }
