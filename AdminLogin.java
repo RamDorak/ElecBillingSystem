@@ -1,4 +1,5 @@
-import javax.swing.*;
+import javax.swing.* ;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,14 +13,17 @@ public class AdminLogin extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton loginButton;
+    private JButton homeButton;
 
     public AdminLogin() {
         setTitle("Admin Login");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(4, 2));
+        homeButton = new JButton("Home");
 
         JLabel usernameLabel = new JLabel("Username:");
         usernameField = new JTextField();
@@ -28,13 +32,15 @@ public class AdminLogin extends JFrame {
         passwordField = new JPasswordField();
 
         loginButton = new JButton("Login");
-
+        
+        
         panel.add(usernameLabel);
         panel.add(usernameField);
         panel.add(passwordLabel);
         panel.add(passwordField);
         panel.add(new JLabel()); //Empty label
         panel.add(loginButton);
+        panel.add(homeButton);
 
         add(panel);
 
@@ -47,7 +53,7 @@ public class AdminLogin extends JFrame {
 
                 String url = "jdbc:mysql://localhost:3306/ramdb";
                 String dbUsername = "root";
-                String dbPassword = "Ping@5858";
+                String dbPassword = "Pass@321";
 
                 String query = "SELECT * FROM admin_table WHERE username = ? AND password = ?";
 
@@ -79,14 +85,29 @@ public class AdminLogin extends JFrame {
 
                 usernameField.setText("");
                 passwordField.setText("");
+
+                
+            }
+        });
+        homeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // Redirect to the home page
+                openHomeScreen();
             }
         });
     }
 
-    public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            AdminLogin adminLoginScreen = new AdminLogin();
-            adminLoginScreen.setVisible(true);
-        });
+    private void openHomeScreen() {
+        HomeScreen homeScreen = new HomeScreen();
+        homeScreen.setVisible(true);
+        dispose(); // Close the AdminLogin window
     }
+
+public static void main (String[] args) {
+    javax.swing.SwingUtilities.invokeLater(() -> {
+        AdminLogin adminLoginScreen = new AdminLogin();
+        adminLoginScreen.setVisible(true);
+    });
+}
 }

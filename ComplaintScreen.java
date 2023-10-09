@@ -11,6 +11,7 @@ public class ComplaintScreen extends JFrame {
     private String customerName;
     private JTextArea complaintTextArea;
     private JButton submitButton;
+    private JButton homeButton;
 
     public ComplaintScreen(String customerName) {
         this.customerName = customerName;
@@ -18,6 +19,7 @@ public class ComplaintScreen extends JFrame {
         setTitle("Raise Complaint");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(3, 1));
@@ -31,6 +33,7 @@ public class ComplaintScreen extends JFrame {
         panel.add(nameLabel);
         panel.add(scrollPane);
         panel.add(submitButton);
+        panel.add(homeButton);
 
         add(panel);
 
@@ -41,7 +44,7 @@ public class ComplaintScreen extends JFrame {
 
                 String url = "jdbc:mysql://localhost:3306/ramdb";
                 String dbUsername = "root";
-                String dbPassword = "Ping@5858";
+                String dbPassword = "Pass@321";
 
                 String query = "INSERT INTO complaints (customer_name, complaint) VALUES (?, ?)";
 
@@ -75,6 +78,18 @@ public class ComplaintScreen extends JFrame {
                 }
             }
         });
+        homeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openHomeScreen();
+            }
+        });
+    }
+
+    private void openHomeScreen() {
+        HomeScreen homeScreen = new HomeScreen();
+        homeScreen.setVisible(true);
+        dispose(); // Close the AdminLogin window
     }
 
     public static void main(String[] args) {

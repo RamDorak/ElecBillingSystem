@@ -12,11 +12,13 @@ public class CustomerLogin extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton loginButton;
+    private JButton homeButton;
 
     public CustomerLogin() {
         setTitle("Customer Login");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(4, 2));
@@ -28,13 +30,15 @@ public class CustomerLogin extends JFrame {
         passwordField = new JPasswordField();
 
         loginButton = new JButton("Login");
+        homeButton = new JButton("Home"); 
 
         panel.add(usernameLabel);
         panel.add(usernameField);
         panel.add(passwordLabel);
         panel.add(passwordField);
-        panel.add(new JLabel()); //Empty label
+        panel.add(new JLabel());
         panel.add(loginButton);
+        panel.add(homeButton);
 
         add(panel);
 
@@ -47,7 +51,7 @@ public class CustomerLogin extends JFrame {
 
                 String url = "jdbc:mysql://localhost:3306/ramdb";
                 String dbUsername = "root";
-                String dbPassword = "Ping@5858";
+                String dbPassword = "Pass@321";
 
                 String query = "SELECT * FROM cust_table WHERE username = ? AND password = ?";
 
@@ -85,6 +89,18 @@ public class CustomerLogin extends JFrame {
                 passwordField.setText("");
             }
         });
+        homeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openHomeScreen();
+            }
+        });
+    }
+
+    private void openHomeScreen() {
+        HomeScreen homeScreen = new HomeScreen();
+        homeScreen.setVisible(true);
+        dispose();
     }
 
     public static void main(String[] args) {

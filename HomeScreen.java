@@ -6,21 +6,39 @@ import java.awt.event.ActionListener;
 public class HomeScreen extends JFrame {
     public HomeScreen() {
         setTitle("Electricity Billing System");
-        setSize(400, 300);
+        setSize(600, 510);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(3, 1));
+        panel.setLayout(new GridLayout(3, 1, 10, 10));
 
         JButton customerLoginButton = new JButton("Customer Login");
         JButton newCustomerButton = new JButton("New Customer");
         JButton adminLoginButton = new JButton("Admin Login");
+
+        // Style the buttons
+        customerLoginButton.setFont(new Font("Arial", Font.BOLD, 16));
+        newCustomerButton.setFont(new Font("Arial", Font.BOLD, 16));
+        adminLoginButton.setFont(new Font("Arial", Font.BOLD, 16));
 
         panel.add(customerLoginButton);
         panel.add(newCustomerButton);
         panel.add(adminLoginButton);
 
         add(panel);
+
+        // Create a JLabel for the image
+        JLabel imageLabel = new JLabel();
+        ImageIcon imageIcon = new ImageIcon("/Users/ramdorak/Desktop/CODE/ElecBillingSystem/image.jpg"); // Replace with the actual image file path
+        imageLabel.setIcon(imageIcon);
+
+        // Add the image label to the mainPanel in the center
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.add(imageLabel, BorderLayout.CENTER);
+        mainPanel.add(panel, BorderLayout.SOUTH);
+
+        add(mainPanel);
 
         customerLoginButton.addActionListener(new ActionListener() {
             @Override
@@ -64,6 +82,12 @@ public class HomeScreen extends JFrame {
 
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(() -> {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             HomeScreen homeScreen = new HomeScreen();
             homeScreen.setVisible(true);
         });

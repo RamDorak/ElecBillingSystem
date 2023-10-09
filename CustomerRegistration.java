@@ -17,6 +17,7 @@ public class CustomerRegistration extends JFrame {
         setTitle("Customer Registration");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(5, 2));
@@ -53,7 +54,7 @@ public class CustomerRegistration extends JFrame {
 
                 String url = "jdbc:mysql://localhost:3306/ramdb";
                 String dbUsername = "root";
-                String dbPassword = "Ping@5858";
+                String dbPassword = "Pass@321";
 
                 String query = "INSERT INTO cust_table (name, username, password) VALUES (?, ?, ?)";
 
