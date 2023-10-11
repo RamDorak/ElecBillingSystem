@@ -16,7 +16,7 @@ public class CustomerLogin extends JFrame {
 
     public CustomerLogin() {
         setTitle("Customer Login");
-        setSize(400, 300);
+        setSize(400, 250);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -29,6 +29,7 @@ public class CustomerLogin extends JFrame {
         JLabel passwordLabel = new JLabel("Password:");
         passwordField = new JPasswordField();
 
+        JPanel buttonPanel = new JPanel();
         loginButton = new JButton("Login");
         homeButton = new JButton("Home"); 
 
@@ -37,9 +38,10 @@ public class CustomerLogin extends JFrame {
         panel.add(passwordLabel);
         panel.add(passwordField);
         panel.add(new JLabel());
-        panel.add(loginButton);
-        panel.add(homeButton);
+        buttonPanel.add(loginButton);
+        buttonPanel.add(homeButton);
 
+        panel.add(buttonPanel);
         add(panel);
 
         loginButton.addActionListener(new ActionListener() {

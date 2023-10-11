@@ -3,11 +3,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-// import java.sql.Connection;
-// import java.sql.DriverManager;
-// import java.sql.PreparedStatement;
-// import java.sql.ResultSet;
-// import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -27,11 +22,9 @@ public class AdminDashboard extends JFrame {
 
         JPanel panel = new JPanel();
         
-        panel.setLayout(new GridLayout(3, 1));
+        panel.setLayout(new GridLayout(2, 1)); 
         
-
-        
-        JButton homeButton = new JButton("Home");
+        JButton homeButton = new JButton("Logout");
         JButton viewCustomerDataButton = new JButton("View Customer Data");
         JButton setMonthlyConsumptionButton = new JButton("Set Monthly Consumption");
         JButton viewComplaintsButton = new JButton("View Complaints");
@@ -40,19 +33,15 @@ public class AdminDashboard extends JFrame {
         panel.add(viewCustomerDataButton);
         panel.add(setMonthlyConsumptionButton);
         panel.add(viewComplaintsButton);
-        
 
         add(panel);
 
         viewCustomerDataButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Transition to view customer data screen
                 viewCustomerData();
             }
-
         });
-
 
         setMonthlyConsumptionButton.addActionListener(new ActionListener() {
             @Override
@@ -73,6 +62,12 @@ public class AdminDashboard extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 // Redirect to the home page
                 openHomeScreen();
+            JOptionPane.showMessageDialog(
+                AdminDashboard.this,
+                "You have been logged out",
+                "LogOut",
+                JOptionPane.INFORMATION_MESSAGE
+            );
         }
         });
     }
@@ -124,11 +119,8 @@ public class AdminDashboard extends JFrame {
                 customerData.append("........").append("\n ");
                 customerData.append("Meter no.: ").append(id).append("\n ");
                 customerData.append("-------------------------------").append("\n ");
-                i++;
-                
-                
+                i++;   
             }
-
             resultSet.close();
             preparedStatement.close();
             connection.close();
@@ -148,12 +140,7 @@ public class AdminDashboard extends JFrame {
         customerDataFrame.add(customerDataPanel);
         customerDataFrame.setVisible(true);
     }
-
-    // ... (existing code)
-
-    
-        
-
+            
     private void openViewComplaintsDialog() {
         try {
             String url = "jdbc:mysql://localhost:3306/ramdb";
@@ -252,13 +239,28 @@ public class AdminDashboard extends JFrame {
         }
     }
     private void updateConsumptionInDatabase(String username, double consumption) {
+        String selectQuery = "SELECT consumption FROM cust_table WHERE username = ?";
         String updateQuery = "UPDATE cust_table SET consumption = ? WHERE username = ?";
         String url = "jdbc:mysql://localhost:3306/ramdb";
         String dbUsername = "root";
         String dbPassword = "Pass@321";
+
         try (Connection connection = DriverManager.getConnection(url, dbUsername, dbPassword);
+            PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
             PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
-            preparedStatement.setDouble(1, consumption);
+            
+            selectStatement.setString(1, username);
+            ResultSet resultSet = selectStatement.executeQuery();
+    
+            double currentConsumption = 0.0;
+            if (resultSet.next()) {
+                currentConsumption = resultSet.getDouble("consumption");
+            }
+    
+            // Calculate new consumption
+            double newConsumption = currentConsumption + consumption;
+        
+            preparedStatement.setDouble(1, newConsumption);
             preparedStatement.setString(2, username);
             int rowsUpdated = preparedStatement.executeUpdate();
             System.out.println(preparedStatement);
@@ -278,7 +280,6 @@ public class AdminDashboard extends JFrame {
         homeScreen.setVisible(true);
         dispose(); 
     }
-
 
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(() -> {

@@ -23,37 +23,52 @@ public class CustomerDashboard extends JFrame {
         this.username = username;
 
         setTitle("Customer Dashboard");
-        setSize(500, 300);
+        setSize(500, 250);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(4, 1));
+        JPanel mainPanel = new JPanel();
+        // mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+
+        // Labels panel
+        JPanel labelsPanel = new JPanel();
+        labelsPanel.setLayout(new BoxLayout(labelsPanel, BoxLayout.Y_AXIS));
 
         JLabel nameLabel = new JLabel("Welcome, " + customerName + "!");
         JLabel consumptionLabel = new JLabel("Your monthly consumption: " + consumption + " kWh");
-        
+
         double bill = calculateBill(consumption);
         JLabel billLabel = new JLabel("Your total bill: Rs." + formatDecimal(bill));
-        JLabel baseBill = new JLabel("Your base consumption: Rs" + baseBill(consumption));
-        JLabel taxLabel = new JLabel("Tax"+ tax(consumption)*100 + "% = " + tax(consumption)*consumption);
+        JLabel baseBillLabel = new JLabel("Your base consumption: Rs" + formatDecimal(baseBill(consumption)));
+        JLabel taxLabel = new JLabel("Tax " + (tax(consumption) * 100) + "% = Rs" + formatDecimal(tax(consumption) * consumption));
+
+        labelsPanel.add(nameLabel);
+        labelsPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Add 10 pixels of spacing
+        labelsPanel.add(consumptionLabel);
+        labelsPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Add 10 pixels of spacing
+        labelsPanel.add(billLabel);
+        labelsPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Add 10 pixels of spacing
+        labelsPanel.add(baseBillLabel);
+        labelsPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Add 10 pixels of spacing
+        labelsPanel.add(taxLabel);
+
+        // Buttons panel
+        JPanel buttonsPanel = new JPanel();
+        buttonsPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
         JButton raiseComplaintButton = new JButton("Raise Complaint");
         payButton = new JButton("Pay Bill");
-        homeButton = new JButton("Home");
-        
-        panel.add(nameLabel);
-        panel.add(consumptionLabel);
-        panel.add(billLabel);
-        panel.add(baseBill);
-        panel.add(taxLabel);
-        
-        panel.add(raiseComplaintButton);
-        panel.add(payButton);
-        panel.add(homeButton);
+        homeButton = new JButton("Logout");
 
+        buttonsPanel.add(raiseComplaintButton);
+        buttonsPanel.add(payButton);
+        buttonsPanel.add(homeButton);
 
-        add(panel);
+        // Add labels panel and buttons panel to the main panel
+        mainPanel.add(labelsPanel);
+        mainPanel.add(buttonsPanel);
+
+        add(mainPanel);
 
         raiseComplaintButton.addActionListener(e -> {
             openRaiseComplaintDialog();
@@ -63,6 +78,13 @@ public class CustomerDashboard extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 openHomeScreen();
+            
+            JOptionPane.showMessageDialog(
+            CustomerDashboard.this,
+            "You have been logged out",
+            "LogOut",
+            JOptionPane.INFORMATION_MESSAGE
+            );
             }
         });
 
@@ -179,7 +201,7 @@ public class CustomerDashboard extends JFrame {
     private void openHomeScreen() {
         HomeScreen homeScreen = new HomeScreen();
         homeScreen.setVisible(true);
-        dispose(); //Close
+        dispose();
     }
 
     private void updateConsumptionInDatabase(String username, double consumption) {

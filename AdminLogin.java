@@ -32,15 +32,17 @@ public class AdminLogin extends JFrame {
         passwordField = new JPasswordField();
 
         loginButton = new JButton("Login");
-        
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(loginButton);
+        buttonPanel.add(homeButton);
         
         panel.add(usernameLabel);
         panel.add(usernameField);
         panel.add(passwordLabel);
         panel.add(passwordField);
-        panel.add(new JLabel()); //Empty label
-        panel.add(loginButton);
-        panel.add(homeButton);
+        panel.add(new JLabel());
+        panel.add(buttonPanel);
 
         add(panel);
 

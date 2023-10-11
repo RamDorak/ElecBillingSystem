@@ -12,6 +12,7 @@ public class CustomerRegistration extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton submitButton;
+    private JButton homeButton;
 
     public CustomerRegistration() {
         setTitle("Customer Registration");
@@ -32,6 +33,11 @@ public class CustomerRegistration extends JFrame {
         passwordField = new JPasswordField();
 
         submitButton = new JButton("Submit");
+        homeButton = new JButton("Home");
+        
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(submitButton);
+        buttonPanel.add(homeButton);
 
         panel.add(nameLabel);
         panel.add(nameField);
@@ -39,8 +45,8 @@ public class CustomerRegistration extends JFrame {
         panel.add(usernameField);
         panel.add(passwordLabel);
         panel.add(passwordField);
-        panel.add(new JLabel()); //Empty label
-        panel.add(submitButton);
+        panel.add(new JLabel());
+        panel.add(buttonPanel);
 
         add(panel);
 
@@ -51,6 +57,14 @@ public class CustomerRegistration extends JFrame {
                 String username = usernameField.getText();
                 char[] passwordChars = passwordField.getPassword();
                 String password = new String(passwordChars);
+
+                if (username.isEmpty()) {
+                    JOptionPane.showMessageDialog(CustomerRegistration.this,
+                            "Username cannot be empty.",
+                            "Validation Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
                 String url = "jdbc:mysql://localhost:3306/ramdb";
                 String dbUsername = "root";
@@ -91,6 +105,18 @@ public class CustomerRegistration extends JFrame {
                 passwordField.setText("");
             }
         });
+        homeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openHomeScreen();
+            }
+        });
+    }
+
+    private void openHomeScreen() {
+        HomeScreen homeScreen = new HomeScreen();
+        homeScreen.setVisible(true);
+        dispose(); //Close
     }
 
     public static void main(String[] args) {
