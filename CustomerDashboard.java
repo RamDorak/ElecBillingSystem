@@ -4,6 +4,7 @@ import java.awt.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.awt.event.ActionEvent;
@@ -16,6 +17,7 @@ public class CustomerDashboard extends JFrame {
     
     private JButton payButton;
     private JButton homeButton;
+    private JButton messagesButton;
 
     public CustomerDashboard(String customerName, double consumption, String username) {
         this.customerName = customerName;
@@ -42,14 +44,16 @@ public class CustomerDashboard extends JFrame {
         JLabel baseBillLabel = new JLabel("Your base consumption: Rs" + formatDecimal(baseBill(consumption)));
         JLabel taxLabel = new JLabel("Tax " + (tax(consumption) * 100) + "% = Rs" + formatDecimal(tax(consumption) * consumption));
 
+        messagesButton = new JButton("Messages");
+
         labelsPanel.add(nameLabel);
-        labelsPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Add 10 pixels of spacing
+        labelsPanel.add(Box.createRigidArea(new Dimension(0, 15))); 
         labelsPanel.add(consumptionLabel);
-        labelsPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Add 10 pixels of spacing
+        labelsPanel.add(Box.createRigidArea(new Dimension(0, 15))); 
         labelsPanel.add(billLabel);
-        labelsPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Add 10 pixels of spacing
+        labelsPanel.add(Box.createRigidArea(new Dimension(0, 15))); 
         labelsPanel.add(baseBillLabel);
-        labelsPanel.add(Box.createRigidArea(new Dimension(0, 15))); // Add 10 pixels of spacing
+        labelsPanel.add(Box.createRigidArea(new Dimension(0, 15)));
         labelsPanel.add(taxLabel);
 
         // Buttons panel
@@ -63,28 +67,26 @@ public class CustomerDashboard extends JFrame {
         buttonsPanel.add(raiseComplaintButton);
         buttonsPanel.add(payButton);
         buttonsPanel.add(homeButton);
+        buttonsPanel.add(messagesButton); 
 
-        // Add labels panel and buttons panel to the main panel
         mainPanel.add(labelsPanel);
         mainPanel.add(buttonsPanel);
-
         add(mainPanel);
 
         raiseComplaintButton.addActionListener(e -> {
             openRaiseComplaintDialog();
-        }
-        );
+        });
         homeButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 openHomeScreen();
             
             JOptionPane.showMessageDialog(
-            CustomerDashboard.this,
-            "You have been logged out",
-            "LogOut",
-            JOptionPane.INFORMATION_MESSAGE
-            );
+                CustomerDashboard.this,
+                "You have been logged out",
+                "LogOut",
+                JOptionPane.INFORMATION_MESSAGE
+                );
             }
         });
 
@@ -94,26 +96,76 @@ public class CustomerDashboard extends JFrame {
                 updateConsumptionInDatabase(username, consumption);
 
             JOptionPane.showMessageDialog(
-            CustomerDashboard.this,
-            "Payment successful, re-login to see changes",
-            "Payment Success",
-            JOptionPane.INFORMATION_MESSAGE
-        );
+                CustomerDashboard.this,
+                "Payment successful, re-login to see changes",
+                "Payment Success",
+                JOptionPane.INFORMATION_MESSAGE
+            );
             }
-            
         });
-        
+        messagesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openMessagesScreen();
+            }
+        });
     }
+    private void openMessagesScreen() {
+        JFrame messagesFrame = new JFrame("Customer Messages");
+        messagesFrame.setSize(400, 300);
+        messagesFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        messagesFrame.setLocationRelativeTo(null);
 
+        JPanel messagesPanel = new JPanel();
+        messagesPanel.setLayout(new BorderLayout());
+
+        JTextArea messagesTextArea = new JTextArea();
+        messagesTextArea.setEditable(false);
+
+        try {
+            String url = "jdbc:mysql://localhost:3306/ramdb";
+            String dbUsername = "root";
+            String dbPassword = "Pass@321";
+
+            Connection connection = DriverManager.getConnection(url, dbUsername, dbPassword);
+
+            String selectQuery = "SELECT cust_name, message, timestamp FROM adminmessage WHERE cust_name = ?";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(selectQuery);
+            preparedStatement.setString(1, username);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                String adminName = resultSet.getString("cust_name");
+                String message = resultSet.getString("message");
+                String timestamp = resultSet.getString("timestamp");
+
+                messagesTextArea.append("From: Administrator\n");
+                messagesTextArea.append("Message: " + message + "\n");
+                messagesTextArea.append("Timestamp: "+ timestamp + "\n\n");
+            }
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            messagesTextArea.setText("An error occurred while retrieving messages.");
+        }
+
+        messagesPanel.add(new JScrollPane(messagesTextArea), BorderLayout.CENTER);
+        messagesFrame.add(messagesPanel);
+        messagesFrame.setVisible(true);
+    }
     private void openRaiseComplaintDialog() {
-    String complaint = JOptionPane.showInputDialog(
-            CustomerDashboard.this,
-            "Enter your complaint:",
-            "Raise Complaint",
-            JOptionPane.QUESTION_MESSAGE
-    );
+        String complaint = JOptionPane.showInputDialog(
+                CustomerDashboard.this,
+                "Enter your complaint:",
+                "Raise Complaint",
+                JOptionPane.QUESTION_MESSAGE
+        );
     
-    if (complaint != null && !complaint.isEmpty()) {
+        if (complaint != null && !complaint.isEmpty()) {
         try {
             String url = "jdbc:mysql://localhost:3306/ramdb";
             String dbUsername = "root";
@@ -158,10 +210,10 @@ public class CustomerDashboard extends JFrame {
             );
         }
     }
-}
-    
+    }
+
     private double calculateBill(double consumption) {
-        // bill calculation with tax
+        // tax slabs
         double tax = 0;
         if(consumption<=100){
             tax = 0;
@@ -169,14 +221,18 @@ public class CustomerDashboard extends JFrame {
         else if(consumption>100 && consumption<=200){
             tax = 0.05;
         }
-        else{
+        else if(consumption>200 && consumption<=300){
             tax = 0.1;
+        }
+        else{
+            tax = 0.2;
         }
         return consumption * 0.15 + consumption * tax;
     }
 
     private double baseBill(double consumption){
-        return consumption*0.15;
+        //0.15 is the consumption cost per unit (1kWh)
+        return consumption*0.15;// returns basic consumption cost
     }
 
     private double tax(double consumption){
@@ -187,8 +243,11 @@ public class CustomerDashboard extends JFrame {
         else if(consumption>100 && consumption<=200){
             tax = 0.05;
         }
-        else{
+        else if(consumption>200 && consumption<=300){
             tax = 0.1;
+        }
+        else{
+            tax = 0.2;
         }
         return tax;
     }

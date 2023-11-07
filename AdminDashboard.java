@@ -14,13 +14,13 @@ import java.util.ArrayList;
 public class AdminDashboard extends JFrame {
     private JButton homeButton;
     public AdminDashboard() {
-        
         setTitle("Admin Dashboard");
-        setSize(600, 400);
+        setSize(600, 200);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
         
         panel.setLayout(new GridLayout(2, 1)); 
         
@@ -28,12 +28,13 @@ public class AdminDashboard extends JFrame {
         JButton viewCustomerDataButton = new JButton("View Customer Data");
         JButton setMonthlyConsumptionButton = new JButton("Set Monthly Consumption");
         JButton viewComplaintsButton = new JButton("View Complaints");
+        JButton messageButton = new JButton("Send Message");
        
         panel.add(homeButton);
         panel.add(viewCustomerDataButton);
         panel.add(setMonthlyConsumptionButton);
         panel.add(viewComplaintsButton);
-
+        panel.add(messageButton);
         add(panel);
 
         viewCustomerDataButton.addActionListener(new ActionListener() {
@@ -70,9 +71,73 @@ public class AdminDashboard extends JFrame {
             );
         }
         });
+        messageButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openSendMessageDialog();
+            }
+        });
     }
+    private void openSendMessageDialog() {
+        String cust_name = JOptionPane.showInputDialog(
+            AdminDashboard.this,
+            "Enter customer username:",
+            "Send Message",
+            JOptionPane.QUESTION_MESSAGE
+        );
 
-        private void viewCustomerData() {
+        if (cust_name != null && !cust_name.isEmpty()) {
+            String message = JOptionPane.showInputDialog(
+                AdminDashboard.this,
+                "Enter your message to the customer:",
+                "Send Message",
+                JOptionPane.QUESTION_MESSAGE
+            );
+
+            if (message != null && !message.isEmpty()) {
+                String url = "jdbc:mysql://localhost:3306/ramdb";
+                String dbUsername = "root";
+                String dbPassword = "Pass@321";
+                String insertQuery = "INSERT INTO adminmessage (cust_name, message) VALUES (?, ?)";
+
+                try (Connection connection = DriverManager.getConnection(url, dbUsername, dbPassword);
+                     PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+
+                    preparedStatement.setString(1, cust_name);
+                    preparedStatement.setString(2, message);
+
+                    int rowsInserted = preparedStatement.executeUpdate();
+
+                    if (rowsInserted > 0) {
+                        JOptionPane.showMessageDialog(
+                            AdminDashboard.this,
+                            "Message sent successfully.",
+                            "Success",
+                            JOptionPane.INFORMATION_MESSAGE
+                        );
+                    } else {
+                        JOptionPane.showMessageDialog(
+                            AdminDashboard.this,
+                            "Failed to send the message.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                        );
+                    }
+
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(
+                        AdminDashboard.this,
+                        "An error occurred while sending the message.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+        }
+    }
+        
+    private void viewCustomerData() {
         JFrame customerDataFrame = new JFrame("Customer Data");
         customerDataFrame.setSize(600, 400);
         customerDataFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

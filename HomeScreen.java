@@ -28,12 +28,10 @@ public class HomeScreen extends JFrame {
 
         add(panel);
 
-        // Create a JLabel for the image
         JLabel imageLabel = new JLabel();
         ImageIcon imageIcon = new ImageIcon("/Users/ramdorak/Desktop/CODE/ElecBillingSystem/image.jpg"); // Replace with the actual image file path
         imageLabel.setIcon(imageIcon);
 
-        // Add the image label to the mainPanel in the center
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(imageLabel, BorderLayout.CENTER);
         mainPanel.add(panel, BorderLayout.SOUTH);
